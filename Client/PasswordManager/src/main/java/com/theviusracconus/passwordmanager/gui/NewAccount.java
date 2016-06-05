@@ -1,21 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package gui;
+package com.theviusracconus.passwordmanager.gui;
 
 import java.awt.event.KeyEvent;
 import javax.swing.SwingUtilities;
-import user.User;
-import user.UserList;
-import reference.Reference;
+import com.theviusracconus.passwordmanager.user.Sites;
+import com.theviusracconus.passwordmanager.user.CurrentUser;
+import com.theviusracconus.passwordmanager.reference.Reference;
+import com.theviusracconus.passwordmanager.reference.ServerCommunication;
+import org.json.simple.JSONObject;
 
-/**
- *
- * @author 16watsones
- */
 public class NewAccount extends javax.swing.JPanel {
 
     /**
@@ -206,24 +198,29 @@ public class NewAccount extends javax.swing.JPanel {
         String username = usernameField.getText();
         String password = Reference.pwString(passwordField.getPassword());
         String confirm = Reference.pwString(confirmField.getPassword());
-        User user;
         
         if(username.length() == 0 || password.length() == 0 || confirm.length() == 0)
         {
             errorMsgLabel.setText("All fields must be filled out!");
         }
-        else if(UserList.userExists(username))
+        /*else if(CurrentUser.userExists(username))
         {
             errorMsgLabel.setText("Username is taken. Please choose another.");
-        }
+        }*/
         else if(password.equals(confirm))
         {
-            user = new User(username, password);
-            UserList.add(user);
-            UserList.currentUser = user;
-            PasswordManagerGUI frame = (PasswordManagerGUI)SwingUtilities.getRoot(this);
-            frame.setPanel("Home");
+            JSONObject data = new JSONObject();
+            data.put("username", username);
+            data.put("password", password);
             
+            String response = ServerCommunication.send("newuser", data.toJSONString());
+            
+            CurrentUser.userId = Integer.parseInt(response.substring(0, response.length() - 1));
+            CurrentUser.username = username;
+            
+            PasswordManagerGUI frame = (PasswordManagerGUI)SwingUtilities.getRoot(this);
+            frame.getHomePanel().initList(CurrentUser.getSites());
+            frame.setPanel("Home");
             errorMsgLabel.setText("");
             usernameField.setText("");
             passwordField.setText("");

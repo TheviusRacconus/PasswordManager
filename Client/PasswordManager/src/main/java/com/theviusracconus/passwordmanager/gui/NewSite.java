@@ -3,18 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gui;
+package com.theviusracconus.passwordmanager.gui;
 
 import java.awt.event.KeyEvent;
 import javax.swing.SwingUtilities;
-import reference.Reference;
-import user.Site;
-import user.UserList;
+import com.theviusracconus.passwordmanager.reference.Reference;
+import com.theviusracconus.passwordmanager.user.Site;
+import com.theviusracconus.passwordmanager.user.CurrentUser;
 
-/**
- *
- * @author ejmod_000
- */
 public class NewSite extends javax.swing.JPanel {
 
     /**
@@ -176,9 +172,9 @@ public class NewSite extends javax.swing.JPanel {
         else
         {
             s = new Site(siteName, username, password);
-            UserList.currentUser.addSite(s);
+            CurrentUser.addSite(s);
             PasswordManagerGUI frame = (PasswordManagerGUI)SwingUtilities.getRoot(this);
-            frame.getHomePanel().initList(UserList.currentUser.getSites());
+            frame.getHomePanel().initList(CurrentUser.getSites());
             frame.setPanel("Home");
             siteNameField.setText("");
             usernameField.setText("");

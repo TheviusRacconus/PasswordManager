@@ -1,4 +1,4 @@
-package gui;
+package com.theviusracconus.passwordmanager.gui;
 
 import java.awt.Desktop;
 import java.awt.event.KeyEvent;
@@ -9,10 +9,11 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import reference.Reference;
-import user.Site;
-import user.User;
-import user.UserList;
+import com.theviusracconus.passwordmanager.reference.Reference;
+import com.theviusracconus.passwordmanager.user.Site;
+import com.theviusracconus.passwordmanager.user.Sites;
+import com.theviusracconus.passwordmanager.user.CurrentUser;
+import java.util.ArrayList;
 
 /**
  *
@@ -80,7 +81,7 @@ public class Home extends javax.swing.JPanel {
         });
         popupMenu.add(openSiteMenu);
 
-        initList(UserList.currentUser.getSites());
+        initList(CurrentUser.getSites());
         siteList.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 siteListMouseClicked(evt);
@@ -197,9 +198,9 @@ public class Home extends javax.swing.JPanel {
     }//GEN-LAST:event_siteListKeyPressed
 
     private void logoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutButtonActionPerformed
-        UserList.currentUser.setRemembered(false);
-        UserList.currentUser = new User("", "");
-        UserList.serialize();
+        CurrentUser.sites = new ArrayList<Site>();
+        CurrentUser.userId = 0;
+        CurrentUser.username = "";
         PasswordManagerGUI frame = (PasswordManagerGUI)SwingUtilities.getRoot(this);
         frame.setPanel("Login");
         String title = frame.getTitle();
@@ -218,7 +219,7 @@ public class Home extends javax.swing.JPanel {
         {
             PasswordManagerGUI frame = (PasswordManagerGUI)SwingUtilities.getRoot(this);
             frame.setPanel("Edit Site");
-            frame.getEditSitePanel().setSite(UserList.currentUser.getSite(index));
+            frame.getEditSitePanel().setSite(CurrentUser.sites.get(index));
         }
     }
     
@@ -231,7 +232,7 @@ public class Home extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(this, "You must select a site!");
         }
         
-        username = UserList.currentUser.getSite(index).getUsername();
+        username = CurrentUser.sites.get(index).getUsername();
         Reference.copy(username);
     }
     
@@ -244,14 +245,14 @@ public class Home extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(this, "You must select a site!");
         }
         
-        password = UserList.currentUser.getSite(index).getPassword();
+        password = CurrentUser.sites.get(index).getPassword();
         Reference.copy(password);
     }
     
     private void openSite()
     {
         int index = siteList.getSelectedIndex();
-        String url = UserList.currentUser.getSite(index).getSiteName();
+        String url = CurrentUser.sites.get(index).getSiteName();
         if(url.length() < 4 || !url.substring(0, 4).equals("www."))
         {
             url = "www." + url;
@@ -263,9 +264,13 @@ public class Home extends javax.swing.JPanel {
             {
                 desktop.browse(new URI(url));
             } 
-            catch (IOException | URISyntaxException e) 
+            catch (IOException ex) 
             {
-                e.printStackTrace();
+                ex.printStackTrace();
+            }
+            catch (URISyntaxException ex)
+            {
+                ex.printStackTrace();
             }
         }
         else
@@ -302,9 +307,9 @@ public class Home extends javax.swing.JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, message);
         if(confirm == JOptionPane.YES_OPTION)
         {
-            UserList.currentUser.removeSites(indices);
+            CurrentUser.removeSites(indices);
         }
-        initList(UserList.currentUser.getSites());
+        initList(CurrentUser.getSites());
     }
     
     private void add()

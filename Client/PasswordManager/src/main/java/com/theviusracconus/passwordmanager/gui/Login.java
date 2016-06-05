@@ -1,16 +1,17 @@
-package gui;
+package com.theviusracconus.passwordmanager.gui;
 
 import java.awt.event.KeyEvent;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import user.User;
-import user.UserList;
+import com.theviusracconus.passwordmanager.user.Sites;
+import com.theviusracconus.passwordmanager.user.CurrentUser;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
-import reference.Reference;
-import user.PasswordEncryption;
+import com.theviusracconus.passwordmanager.reference.Reference;
+import com.theviusracconus.passwordmanager.reference.ServerCommunication;
+import org.json.simple.JSONObject;
 
 
 public class Login extends javax.swing.JPanel {
@@ -176,51 +177,46 @@ public class Login extends javax.swing.JPanel {
 
     private void login()
     {
-        PasswordEncryption encrypt = new PasswordEncryption();
         String username = usernameField.getText();
         char[] pwArray = passwordField.getPassword();
         String password = Reference.pwString(pwArray);
-        String message = "User not found!";
-        
-        for(int i = 0; i < UserList.users.size(); i++)
+
+        if(username.length() == 0 || password.length() == 0)
         {
-            if(username.equals(UserList.users.get(i).getUsername()))
+            errorMsgLabel.setText("All fields must be filled out");
+        }
+        else
+        {
+            JSONObject data = new JSONObject();
+            data.put("username", username);
+            data.put("password", password);
+            
+            String response = ServerCommunication.send("login", data.toJSONString());
+            
+            System.out.println(response);
+            
+            if(response.equals("not found\n"))
             {
-                try 
-                {
-                    if(encrypt.authenticate(password, UserList.users.get(i).getPassword(),
-                            UserList.users.get(i).getSalt()))
-                    {
-                        UserList.currentUser = UserList.users.get(i);
-                        if(rememberCheckBox.isSelected())
-                        {
-                            UserList.users.get(i).setRemembered(true);
-                            UserList.serialize();
-                        }
-                        PasswordManagerGUI frame = (PasswordManagerGUI)SwingUtilities.getRoot(this);
-                        frame.getHomePanel().initList(UserList.currentUser.getSites());
-                        frame.setPanel("Home");
-                        
-                        usernameField.setText("");
-                        passwordField.setText("");
-                        rememberCheckBox.setSelected(false);
-                        errorMsgLabel.setText("");
-                        return;
-                    }
-                    else
-                    {
-                        message = "Incorrect Password!";
-                    }
-                } 
-                catch (NoSuchAlgorithmException  | InvalidKeySpecException ex) 
-                {
-                    ex.printStackTrace();
-                }
-                
+                errorMsgLabel.setText("User " + username + " not found!");
+            }
+            else if(response.equals("incorrect password\n"))
+            {
+                errorMsgLabel.setText("Incorrect Password!");
+            }
+            else
+            {
+                CurrentUser.userId = Integer.parseInt(response.substring(0, response.length() - 1));
+                CurrentUser.username = username;
+                CurrentUser.readSites();
+                PasswordManagerGUI frame = (PasswordManagerGUI)SwingUtilities.getRoot(this);
+                frame.getHomePanel().initList(CurrentUser.getSites());
+                frame.setPanel("Home");
+                errorMsgLabel.setText("");
+                usernameField.setText("");
+                passwordField.setText("");
             }
         }
         
-        errorMsgLabel.setText(message);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

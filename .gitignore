@@ -1,5 +1,6 @@
-/build
-/dist
-/files
-/test
-/nbproject
+/Client/build
+/Client/dist
+/Client/files
+/Client/test
+/Client/nbproject
+/Client/PasswordManager/target/

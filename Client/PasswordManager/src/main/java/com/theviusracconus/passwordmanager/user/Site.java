@@ -1,4 +1,4 @@
-package user;
+package com.theviusracconus.passwordmanager.user;
 
 import java.io.Serializable;
 

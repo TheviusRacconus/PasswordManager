@@ -4,12 +4,12 @@
  * and open the template in the editor.
  */
 
-package gui;
+package com.theviusracconus.passwordmanager.gui;
 
 import javax.swing.SwingUtilities;
-import reference.Reference;
-import user.Site;
-import user.UserList;
+import com.theviusracconus.passwordmanager.reference.Reference;
+import com.theviusracconus.passwordmanager.user.Site;
+import com.theviusracconus.passwordmanager.user.CurrentUser;
 
 /**
  *
@@ -133,9 +133,9 @@ public class EditSite extends javax.swing.JPanel {
             currentSite.setSiteName(siteName);
             currentSite.setUsername(username);
             currentSite.setPassword(password);
-            UserList.serialize();
+            CurrentUser.updateSites();
             PasswordManagerGUI frame = (PasswordManagerGUI)SwingUtilities.getRoot(this);
-            frame.getHomePanel().initList(UserList.currentUser.getSites());
+            frame.getHomePanel().initList(CurrentUser.getSites());
             frame.setPanel("Home");
             siteNameField.setText("");
             usernameField.setText("");

@@ -1,10 +1,10 @@
-package gui;
+package com.theviusracconus.passwordmanager.gui;
 
-import user.UserList;
+import com.theviusracconus.passwordmanager.user.CurrentUser;
 import java.awt.CardLayout;
 import java.awt.Image;
 import javax.swing.ImageIcon;
-import reference.Reference;
+import com.theviusracconus.passwordmanager.reference.Reference;
 
 public class PasswordManagerGUI extends javax.swing.JFrame 
 {
@@ -26,7 +26,7 @@ public class PasswordManagerGUI extends javax.swing.JFrame
         editSitePanel = new EditSite();
         initComponents();
         
-        ImageIcon icon = new ImageIcon(getClass().getResource("/resources/lock.png"));
+        ImageIcon icon = new ImageIcon(getClass().getResource("/lock.png"));
         setIconImage(icon.getImage());
         
         cards.add(loginPanel, "Login");
@@ -37,14 +37,16 @@ public class PasswordManagerGUI extends javax.swing.JFrame
         
         cardLayout = (CardLayout) cards.getLayout();
         
-        if(!UserList.currentUser.getUsername().equals(""))
+        /*if(!CurrentUser.sites.getUsername().equals(""))
         {
             setPanel("Home");
         }
         else
         {
             setPanel("Login");   
-        }
+        }*/
+        
+        setPanel("Login");
     }
 
     @SuppressWarnings("unchecked")
@@ -76,7 +78,7 @@ public class PasswordManagerGUI extends javax.swing.JFrame
     {
         if(title.equals("Home") && getTitle().indexOf("-") == -1)
         {
-            setTitle(getTitle() + " - " + UserList.currentUser.getUsername());
+            setTitle(getTitle() + " - " + CurrentUser.username);
         }
         cardLayout.show(cards, title);
     }
@@ -118,7 +120,6 @@ public class PasswordManagerGUI extends javax.swing.JFrame
         }
         //</editor-fold>
 
-        UserList.initList();
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
